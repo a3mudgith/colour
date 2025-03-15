@@ -3,123 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto-Prediction Fortune Game</title>
+    <title>Color Prediction Game</title>
     <style>
+        :root {
+            --red-color: #e74c3c;
+            --green-color: #2ecc71;
+            --blue-color: #3498db;
+            --dark-bg: #2c3e50;
+            --light-bg: #ecf0f1;
+            --highlight: #f39c12;
+        }
+        
         body {
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #6e8efb, #a777e3);
-            color: #333;
+            background-color: var(--dark-bg);
+            color: white;
             text-align: center;
+            margin: 0;
             padding: 20px;
             min-height: 100vh;
-            margin: 0;
             display: flex;
             flex-direction: column;
             justify-content: center;
-            align-items: center;
         }
         
         .container {
             max-width: 800px;
-            background-color: rgba(255, 255, 255, 0.9);
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.3);
             border-radius: 15px;
             padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            margin: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
         
         h1 {
-            color: #6d23b6;
+            color: var(--highlight);
             font-size: 36px;
             margin-bottom: 10px;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
         
         .subtitle {
-            color: #8e44ad;
+            color: var(--light-bg);
             font-size: 18px;
             margin-top: 0;
             margin-bottom: 30px;
         }
         
-        .crystal-ball {
-            width: 200px;
-            height: 200px;
-            background: radial-gradient(circle at 70px 70px, #9c88ff, #5f27cd);
-            border-radius: 50%;
-            margin: 0 auto 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
-                        inset 0 0 30px rgba(255, 255, 255, 0.3);
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        
-        .crystal-ball:hover {
-            transform: scale(1.05);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4),
-                        inset 0 0 40px rgba(255, 255, 255, 0.4);
-        }
-        
-        .crystal-ball::before {
-            content: "";
-            position: absolute;
-            top: 20px;
-            left: 35px;
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.4);
-            border-radius: 50%;
-            filter: blur(5px);
-        }
-        
-        .crystal-ball::after {
-            content: "";
-            position: absolute;
-            top: 10px;
-            left: 20px;
-            width: 25px;
-            height: 25px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            filter: blur(2px);
-        }
-        
-        .prediction-box {
-            background-color: rgba(255, 255, 255, 0.8);
+        .game-info {
+            background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            padding: 20px;
-            margin-top: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            min-height: 100px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            position: relative;
+            padding: 15px;
+            margin-bottom: 20px;
         }
         
-        .prediction-text {
-            font-size: 18px;
-            line-height: 1.6;
-            color: #333;
-            margin-bottom: 10px;
+        .balance {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--highlight);
         }
         
-        .timer {
+        .timer-section {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            margin: 20px 0;
         }
         
         .timer-circle {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            background: conic-gradient(#6e8efb 0% 100%, #eaeaea 100% 100%);
+            background: conic-gradient(var(--highlight) 0% 100%, rgba(255, 255, 255, 0.2) 100% 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -127,27 +82,143 @@
         }
         
         .timer-inner {
-            width: 50px;
-            height: 50px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
-            background: white;
+            background: var(--dark-bg);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 24px;
+            font-size: 30px;
             font-weight: bold;
-            color: #6d23b6;
+            color: white;
         }
         
-        .controls {
+        .color-history {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: center;
+            margin: 30px 0;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px;
+        }
+        
+        .color-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .color-box.red {
+            background-color: var(--red-color);
+        }
+        
+        .color-box.green {
+            background-color: var(--green-color);
+        }
+        
+        .color-box.blue {
+            background-color: var(--blue-color);
+        }
+        
+        .color-box.newest {
+            transform: scale(1.15);
+            border: 2px solid white;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+        
+        .prediction-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .prediction-buttons {
+            display: flex;
+            gap: 15px;
             margin-top: 20px;
+        }
+        
+        .predict-btn {
+            width: 120px;
+            height: 80px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
             display: flex;
             justify-content: center;
-            gap: 10px;
+            align-items: center;
         }
         
-        button {
-            background-color: #6d23b6;
+        .predict-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+        }
+        
+        .predict-btn.red {
+            background-color: var(--red-color);
+        }
+        
+        .predict-btn.green {
+            background-color: var(--green-color);
+        }
+        
+        .predict-btn.blue {
+            background-color: var(--blue-color);
+        }
+        
+        .bet-section {
+            margin: 20px 0;
+        }
+        
+        .bet-label {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .bet-input {
+            width: 150px;
+            padding: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .message {
+            font-size: 24px;
+            font-weight: bold;
+            height: 30px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .win-message {
+            color: var(--green-color);
+            animation: pulse 1s infinite;
+        }
+        
+        .lose-message {
+            color: var(--red-color);
+        }
+        
+        .settings {
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        button.control-btn {
+            background-color: rgba(255, 255, 255, 0.2);
             color: white;
             border: none;
             padding: 10px 20px;
@@ -157,67 +228,63 @@
             transition: background-color 0.3s;
         }
         
-        button:hover {
-            background-color: #5c1e9a;
+        button.control-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
         }
         
-        .paused {
-            background-color: #e74c3c;
+        .stat {
+            display: flex;
+            justify-content: space-around;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
         }
         
-        .paused:hover {
-            background-color: #c0392b;
+        .stat-item {
+            display: flex;
+            flex-direction: column;
         }
         
-        .footer {
-            margin-top: 30px;
-            color: rgba(255, 255, 255, 0.7);
+        .stat-label {
             font-size: 14px;
+            color: var(--light-bg);
         }
         
-        .spinner {
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top: 4px solid white;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            position: absolute;
-            top: calc(50% - 20px);
-            left: calc(50% - 20px);
-            display: none;
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
         }
         
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
         }
         
-        .glow {
-            animation: glow-effect 2s 1;
+        .disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
-        @keyframes glow-effect {
-            0% { box-shadow: 0 0 5px #9c88ff; }
-            50% { box-shadow: 0 0 30px #9c88ff; }
-            100% { box-shadow: 0 0 5px #9c88ff; }
+        @media (max-width: 600px) {
+            .prediction-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Fortune Predictor</h1>
-        <p class="subtitle">New prediction every 10 seconds!</p>
+        <h1>Color Prediction Game</h1>
+        <p class="subtitle">Predict the next color and win!</p>
         
-        <div class="crystal-ball" id="crystal-ball">
-            <div class="spinner" id="spinner"></div>
+        <div class="game-info">
+            <p>Your Balance: <span class="balance" id="balance">1000</span> credits</p>
         </div>
         
-        <div class="prediction-box">
-            <p class="prediction-text" id="prediction-text">Click the crystal ball or wait for the next prediction...</p>
-        </div>
-        
-        <div class="timer">
+        <div class="timer-section">
             <div class="timer-circle" id="timer-circle">
                 <div class="timer-inner">
                     <span id="timer-count">10</span>
@@ -225,82 +292,102 @@
             </div>
         </div>
         
-        <div class="controls">
-            <button id="pause-btn">Pause</button>
-            <button id="new-prediction-btn">New Prediction</button>
+        <div class="message" id="message"></div>
+        
+        <div class="color-history" id="color-history">
+            <!-- Color history will be filled dynamically -->
+        </div>
+        
+        <div class="bet-section">
+            <p class="bet-label">Your Bet Amount:</p>
+            <input type="number" class="bet-input" id="bet-amount" min="10" max="1000" value="100">
+        </div>
+        
+        <div class="prediction-section">
+            <p>Predict the next color:</p>
+            <div class="prediction-buttons">
+                <button class="predict-btn red" id="predict-red">RED</button>
+                <button class="predict-btn green" id="predict-green">GREEN</button>
+                <button class="predict-btn blue" id="predict-blue">BLUE</button>
+            </div>
+        </div>
+        
+        <div class="stat">
+            <div class="stat-item">
+                <span class="stat-label">Rounds</span>
+                <span class="stat-value" id="rounds">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Wins</span>
+                <span class="stat-value" id="wins">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Losses</span>
+                <span class="stat-value" id="losses">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Win Rate</span>
+                <span class="stat-value" id="win-rate">0%</span>
+            </div>
+        </div>
+        
+        <div class="settings">
+            <button class="control-btn" id="reset-btn">Reset Game</button>
+            <button class="control-btn" id="pause-btn">Pause</button>
         </div>
     </div>
     
-    <div class="footer">
-        <p>For entertainment purposes only</p>
-    </div>
-    
     <script>
-        // Predictions list
-        const predictions = [
-            "A smile from a stranger will brighten your day tomorrow.",
-            "An unexpected opportunity will present itself within the next week.",
-            "Someone is thinking about you right now.",
-            "Your creativity will lead to an exciting breakthrough soon.",
-            "A small investment now will pay off tenfold in the future.",
-            "The obstacle you're facing is actually a blessing in disguise.",
-            "A long-lost friend will reconnect with you soon.",
-            "Your kindness to others will return to you in unexpected ways.",
-            "Trust your intuition on an upcoming decision.",
-            "A dream you've had will begin to take shape in reality.",
-            "Someone will seek your advice on an important matter.",
-            "Your patience will be rewarded more quickly than you expect.",
-            "A journey awaits you, either literal or metaphorical.",
-            "Something you lost will find its way back to you.",
-            "Your hard work is about to pay off in a big way.",
-            "A challenge you're facing will resolve itself naturally.",
-            "You will soon discover a hidden talent.",
-            "An unexpected gift is coming your way.",
-            "Your next bold move will lead to success.",
-            "A burden you've been carrying will soon be lifted.",
-            "The answer you seek is closer than you think.",
-            "You will find what you're looking for in an unexpected place.",
-            "A pleasant surprise awaits you in the coming days.",
-            "Your generosity will open new doors for you.",
-            "Don't be afraid to take that leap of faith you've been considering.",
-            "Someone appreciates you more than you realize.",
-            "Your next creative project will be your most successful yet.",
-            "A misunderstanding will soon be cleared up.",
-            "You will overcome a fear that has been holding you back.",
-            "Good news is on its way to you right now.",
-            "Your positive attitude will attract positive outcomes.",
-            "Trust your first instinct on the next major decision.",
-            "A small change in your routine will lead to big improvements.",
-            "You will soon find the perfect solution to a persistent problem.",
-            "A new friendship will bring unexpected joy to your life.",
-            "Your sense of humor will help you through a difficult situation.",
-            "An opportunity you thought was lost will return in a new form.",
-            "You will receive recognition for something you've worked hard on.",
-            "A dream you've had since childhood will finally come true.",
-            "The book you need to read will find its way to you."
-        ];
-        
-        // Get DOM elements
-        const crystalBall = document.getElementById('crystal-ball');
-        const predictionText = document.getElementById('prediction-text');
-        const timerCount = document.getElementById('timer-count');
-        const timerCircle = document.getElementById('timer-circle');
-        const pauseBtn = document.getElementById('pause-btn');
-        const newPredictionBtn = document.getElementById('new-prediction-btn');
-        const spinner = document.getElementById('spinner');
-        
         // Game variables
+        const colors = ['red', 'green', 'blue'];
         let timer = 10;
         let interval;
         let isPaused = false;
-        let currentPredictionIndex = -1;
+        let colorHistory = [];
+        let balance = 1000;
+        let currentBet = 0;
+        let currentPrediction = null;
+        let stats = {
+            rounds: 0,
+            wins: 0,
+            losses: 0
+        };
+        
+        // DOM elements
+        const timerCount = document.getElementById('timer-count');
+        const timerCircle = document.getElementById('timer-circle');
+        const balanceDisplay = document.getElementById('balance');
+        const colorHistoryContainer = document.getElementById('color-history');
+        const betInput = document.getElementById('bet-amount');
+        const messageDisplay = document.getElementById('message');
+        const predictRedBtn = document.getElementById('predict-red');
+        const predictGreenBtn = document.getElementById('predict-green');
+        const predictBlueBtn = document.getElementById('predict-blue');
+        const resetBtn = document.getElementById('reset-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const roundsDisplay = document.getElementById('rounds');
+        const winsDisplay = document.getElementById('wins');
+        const lossesDisplay = document.getElementById('losses');
+        const winRateDisplay = document.getElementById('win-rate');
         
         // Initialize the game
         function initGame() {
+            // Start with one random color
+            addRandomColor();
+            
+            // Start timer
             startTimer();
-            crystalBall.addEventListener('click', generatePrediction);
+            
+            // Add event listeners
+            predictRedBtn.addEventListener('click', () => makePrediction('red'));
+            predictGreenBtn.addEventListener('click', () => makePrediction('green'));
+            predictBlueBtn.addEventListener('click', () => makePrediction('blue'));
+            resetBtn.addEventListener('click', resetGame);
             pauseBtn.addEventListener('click', togglePause);
-            newPredictionBtn.addEventListener('click', generatePrediction);
+            
+            // Update displays
+            updateBalance();
+            updateStats();
         }
         
         // Start the timer
@@ -313,7 +400,7 @@
                     
                     if (timer <= 0) {
                         timer = 10;
-                        generatePrediction();
+                        revealResult();
                     }
                 }
             }, 1000);
@@ -323,57 +410,80 @@
         function updateTimerDisplay() {
             timerCount.textContent = timer;
             const percentage = (timer / 10) * 100;
-            timerCircle.style.background = `conic-gradient(#6e8efb 0% ${percentage}%, #eaeaea ${percentage}% 100%)`;
+            timerCircle.style.background = `conic-gradient(var(--highlight) 0% ${percentage}%, rgba(255, 255, 255, 0.2) ${percentage}% 100%)`;
         }
         
-        // Generate a prediction
-        function generatePrediction() {
-            if (isPaused) return;
+        // Add a random color to history
+        function addRandomColor() {
+            const randomIndex = Math.floor(Math.random() * colors.length);
+            const color = colors[randomIndex];
+            colorHistory.unshift(color);
             
-            // Show spinner
-            spinner.style.display = 'block';
-            
-            // Add glow effect to crystal ball
-            crystalBall.classList.add('glow');
-            
-            // Generate a random prediction (different from the current one)
-            let newIndex;
-            do {
-                newIndex = Math.floor(Math.random() * predictions.length);
-            } while (newIndex === currentPredictionIndex);
-            
-            currentPredictionIndex = newIndex;
-            
-            // Reset timer
-            timer = 10;
-            updateTimerDisplay();
-            
-            // Display prediction with slight delay for effect
-            setTimeout(() => {
-                predictionText.textContent = predictions[currentPredictionIndex];
-                spinner.style.display = 'none';
-                
-                // Remove glow effect after a delay
-                setTimeout(() => {
-                    crystalBall.classList.remove('glow');
-                }, 2000);
-            }, 500);
-        }
-        
-        // Toggle pause
-        function togglePause() {
-            isPaused = !isPaused;
-            if (isPaused) {
-                pauseBtn.textContent = "Resume";
-                pauseBtn.classList.add('paused');
-            } else {
-                pauseBtn.textContent = "Pause";
-                pauseBtn.classList.remove('paused');
+            // Limit history to 10 items
+            if (colorHistory.length > 10) {
+                colorHistory.pop();
             }
+            
+            updateColorHistory();
+            stats.rounds++;
+            updateStats();
         }
         
-        // Initialize when DOM is loaded
-        document.addEventListener('DOMContentLoaded', initGame);
-    </script>
-</body>
-</html>
+        // Update color history display
+        function updateColorHistory() {
+            colorHistoryContainer.innerHTML = '';
+            
+            colorHistory.forEach((color, index) => {
+                const colorBox = document.createElement('div');
+                colorBox.className = `color-box ${color}`;
+                if (index === 0) {
+                    colorBox.classList.add('newest');
+                }
+                colorHistoryContainer.appendChild(colorBox);
+            });
+        }
+        
+        // Make a prediction
+        function makePrediction(color) {
+            if (isPaused || currentPrediction) return;
+            
+            // Get bet amount
+            const betAmount = parseInt(betInput.value);
+            
+            // Validate bet
+            if (isNaN(betAmount) || betAmount < 10) {
+                messageDisplay.textContent = 'Minimum bet is 10 credits!';
+                messageDisplay.className = 'message lose-message';
+                return;
+            }
+            
+            if (betAmount > balance) {
+                messageDisplay.textContent = 'Not enough credits!';
+                messageDisplay.className = 'message lose-message';
+                return;
+            }
+            
+            // Save current bet
+            currentBet = betAmount;
+            currentPrediction = color;
+            
+            // Update UI
+            messageDisplay.textContent = `Prediction: ${color.toUpperCase()}`;
+            messageDisplay.className = 'message';
+            
+            // Disable buttons
+            disablePredictionButtons();
+        }
+        
+        // Reveal the result
+        function revealResult() {
+            // Add new color
+            addRandomColor();
+            
+            // Check if there was a prediction
+            if (currentPrediction) {
+                const latestColor = colorHistory[0];
+                
+                if (currentPrediction === latestColor) {
+                    // Player wins
+                    const winAmount = current
