@@ -1,489 +1,120 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Color Prediction Game</title>
-    <style>
-        :root {
-            --red-color: #e74c3c;
-            --green-color: #2ecc71;
-            --blue-color: #3498db;
-            --dark-bg: #2c3e50;
-            --light-bg: #ecf0f1;
-            --highlight: #f39c12;
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: var(--dark-bg);
-            color: white;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-        
-        h1 {
-            color: var(--highlight);
-            font-size: 36px;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-        
-        .subtitle {
-            color: var(--light-bg);
-            font-size: 18px;
-            margin-top: 0;
-            margin-bottom: 30px;
-        }
-        
-        .game-info {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .balance {
-            font-size: 24px;
-            font-weight: bold;
-            color: var(--highlight);
-        }
-        
-        .timer-section {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 20px 0;
-        }
-        
-        .timer-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: conic-gradient(var(--highlight) 0% 100%, rgba(255, 255, 255, 0.2) 100% 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-        
-        .timer-inner {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background: var(--dark-bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 30px;
-            font-weight: bold;
-            color: white;
-        }
-        
-        .color-history {
-            display: flex;
-            flex-direction: row-reverse;
-            justify-content: center;
-            margin: 30px 0;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 10px;
-        }
-        
-        .color-box {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .color-box.red {
-            background-color: var(--red-color);
-        }
-        
-        .color-box.green {
-            background-color: var(--green-color);
-        }
-        
-        .color-box.blue {
-            background-color: var(--blue-color);
-        }
-        
-        .color-box.newest {
-            transform: scale(1.15);
-            border: 2px solid white;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
-        }
-        
-        .prediction-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 20px 0;
-        }
-        
-        .prediction-buttons {
-            display: flex;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        .predict-btn {
-            width: 120px;
-            height: 80px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            transition: all 0.3s ease;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .predict-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-        }
-        
-        .predict-btn.red {
-            background-color: var(--red-color);
-        }
-        
-        .predict-btn.green {
-            background-color: var(--green-color);
-        }
-        
-        .predict-btn.blue {
-            background-color: var(--blue-color);
-        }
-        
-        .bet-section {
-            margin: 20px 0;
-        }
-        
-        .bet-label {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        
-        .bet-input {
-            width: 150px;
-            padding: 10px;
-            font-size: 18px;
-            border: none;
-            border-radius: 5px;
-            text-align: center;
-        }
-        
-        .message {
-            font-size: 24px;
-            font-weight: bold;
-            height: 30px;
-            margin: 15px 0;
-            transition: all 0.3s ease;
-        }
-        
-        .win-message {
-            color: var(--green-color);
-            animation: pulse 1s infinite;
-        }
-        
-        .lose-message {
-            color: var(--red-color);
-        }
-        
-        .settings {
-            margin-top: 30px;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-        }
-        
-        button.control-btn {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        
-        button.control-btn:hover {
-            background-color: rgba(255, 255, 255, 0.3);
-        }
-        
-        .stat {
-            display: flex;
-            justify-content: space-around;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 15px;
-            margin-top: 20px;
-        }
-        
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .stat-label {
-            font-size: 14px;
-            color: var(--light-bg);
-        }
-        
-        .stat-value {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        @media (max-width: 600px) {
-            .prediction-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Color Prediction Game</h1>
-        <p class="subtitle">Predict the next color and win!</p>
-        
-        <div class="game-info">
-            <p>Your Balance: <span class="balance" id="balance">1000</span> credits</p>
-        </div>
-        
-        <div class="timer-section">
-            <div class="timer-circle" id="timer-circle">
-                <div class="timer-inner">
-                    <span id="timer-count">10</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="message" id="message"></div>
-        
-        <div class="color-history" id="color-history">
-            <!-- Color history will be filled dynamically -->
-        </div>
-        
-        <div class="bet-section">
-            <p class="bet-label">Your Bet Amount:</p>
-            <input type="number" class="bet-input" id="bet-amount" min="10" max="1000" value="100">
-        </div>
-        
-        <div class="prediction-section">
-            <p>Predict the next color:</p>
-            <div class="prediction-buttons">
-                <button class="predict-btn red" id="predict-red">RED</button>
-                <button class="predict-btn green" id="predict-green">GREEN</button>
-                <button class="predict-btn blue" id="predict-blue">BLUE</button>
-            </div>
-        </div>
-        
-        <div class="stat">
-            <div class="stat-item">
-                <span class="stat-label">Rounds</span>
-                <span class="stat-value" id="rounds">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Wins</span>
-                <span class="stat-value" id="wins">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Losses</span>
-                <span class="stat-value" id="losses">0</span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label">Win Rate</span>
-                <span class="stat-value" id="win-rate">0%</span>
-            </div>
-        </div>
-        
-        <div class="settings">
-            <button class="control-btn" id="reset-btn">Reset Game</button>
-            <button class="control-btn" id="pause-btn">Pause</button>
-        </div>
-    </div>
+I'll create a simple color-based gambling game for you!
+
+```javascript
+class ColorCashGame {
+  constructor(initialBalance = 100) {
+    this.balance = initialBalance;
+    this.history = [];
+  }
+
+  // Play a round with the chosen color
+  play(color, betAmount) {
+    if (betAmount <= 0 || betAmount > this.balance) {
+      return `Invalid bet amount. Your balance is $${this.balance}.`;
+    }
+
+    // Calculate result based on color probabilities
+    const roll = Math.random();
+    let winAmount = 0;
+    let outcome = '';
     
-    <script>
-        // Game variables
-        const colors = ['red', 'green', 'blue'];
-        let timer = 10;
-        let interval;
-        let isPaused = false;
-        let colorHistory = [];
-        let balance = 1000;
-        let currentBet = 0;
-        let currentPrediction = null;
-        let stats = {
-            rounds: 0,
-            wins: 0,
-            losses: 0
-        };
-        
-        // DOM elements
-        const timerCount = document.getElementById('timer-count');
-        const timerCircle = document.getElementById('timer-circle');
-        const balanceDisplay = document.getElementById('balance');
-        const colorHistoryContainer = document.getElementById('color-history');
-        const betInput = document.getElementById('bet-amount');
-        const messageDisplay = document.getElementById('message');
-        const predictRedBtn = document.getElementById('predict-red');
-        const predictGreenBtn = document.getElementById('predict-green');
-        const predictBlueBtn = document.getElementById('predict-blue');
-        const resetBtn = document.getElementById('reset-btn');
-        const pauseBtn = document.getElementById('pause-btn');
-        const roundsDisplay = document.getElementById('rounds');
-        const winsDisplay = document.getElementById('wins');
-        const lossesDisplay = document.getElementById('losses');
-        const winRateDisplay = document.getElementById('win-rate');
-        
-        // Initialize the game
-        function initGame() {
-            // Start with one random color
-            addRandomColor();
-            
-            // Start timer
-            startTimer();
-            
-            // Add event listeners
-            predictRedBtn.addEventListener('click', () => makePrediction('red'));
-            predictGreenBtn.addEventListener('click', () => makePrediction('green'));
-            predictBlueBtn.addEventListener('click', () => makePrediction('blue'));
-            resetBtn.addEventListener('click', resetGame);
-            pauseBtn.addEventListener('click', togglePause);
-            
-            // Update displays
-            updateBalance();
-            updateStats();
+    switch(color.toLowerCase()) {
+      case 'green':
+        // 60% chance to win 1.5x
+        if (roll < 0.6) {
+          winAmount = betAmount * 0.5;
+          outcome = 'win';
+        } else {
+          winAmount = -betAmount;
+          outcome = 'loss';
         }
-        
-        // Start the timer
-        function startTimer() {
-            clearInterval(interval);
-            interval = setInterval(() => {
-                if (!isPaused) {
-                    timer--;
-                    updateTimerDisplay();
-                    
-                    if (timer <= 0) {
-                        timer = 10;
-                        revealResult();
-                    }
-                }
-            }, 1000);
+        break;
+      case 'red':
+        // 30% chance to win 3x
+        if (roll < 0.3) {
+          winAmount = betAmount * 2;
+          outcome = 'win';
+        } else {
+          winAmount = -betAmount;
+          outcome = 'loss';
         }
-        
-        // Update timer display
-        function updateTimerDisplay() {
-            timerCount.textContent = timer;
-            const percentage = (timer / 10) * 100;
-            timerCircle.style.background = `conic-gradient(var(--highlight) 0% ${percentage}%, rgba(255, 255, 255, 0.2) ${percentage}% 100%)`;
+        break;
+      case 'gold':
+        // 10% chance to win 10x
+        if (roll < 0.1) {
+          winAmount = betAmount * 9;
+          outcome = 'win';
+        } else {
+          winAmount = -betAmount;
+          outcome = 'loss';
         }
-        
-        // Add a random color to history
-        function addRandomColor() {
-            const randomIndex = Math.floor(Math.random() * colors.length);
-            const color = colors[randomIndex];
-            colorHistory.unshift(color);
-            
-            // Limit history to 10 items
-            if (colorHistory.length > 10) {
-                colorHistory.pop();
-            }
-            
-            updateColorHistory();
-            stats.rounds++;
-            updateStats();
-        }
-        
-        // Update color history display
-        function updateColorHistory() {
-            colorHistoryContainer.innerHTML = '';
-            
-            colorHistory.forEach((color, index) => {
-                const colorBox = document.createElement('div');
-                colorBox.className = `color-box ${color}`;
-                if (index === 0) {
-                    colorBox.classList.add('newest');
-                }
-                colorHistoryContainer.appendChild(colorBox);
-            });
-        }
-        
-        // Make a prediction
-        function makePrediction(color) {
-            if (isPaused || currentPrediction) return;
-            
-            // Get bet amount
-            const betAmount = parseInt(betInput.value);
-            
-            // Validate bet
-            if (isNaN(betAmount) || betAmount < 10) {
-                messageDisplay.textContent = 'Minimum bet is 10 credits!';
-                messageDisplay.className = 'message lose-message';
-                return;
-            }
-            
-            if (betAmount > balance) {
-                messageDisplay.textContent = 'Not enough credits!';
-                messageDisplay.className = 'message lose-message';
-                return;
-            }
-            
-            // Save current bet
-            currentBet = betAmount;
-            currentPrediction = color;
-            
-            // Update UI
-            messageDisplay.textContent = `Prediction: ${color.toUpperCase()}`;
-            messageDisplay.className = 'message';
-            
-            // Disable buttons
-            disablePredictionButtons();
-        }
-        
-        // Reveal the result
-        function revealResult() {
-            // Add new color
-            addRandomColor();
-            
-            // Check if there was a prediction
-            if (currentPrediction) {
-                const latestColor = colorHistory[0];
-                
-                if (currentPrediction === latestColor) {
-                    // Player wins
-                    const winAmount = current
+        break;
+      default:
+        return "Invalid color. Please choose green, red, or gold.";
+    }
+
+    // Update balance
+    this.balance += winAmount;
+    
+    // Record history
+    this.history.push({
+      color,
+      betAmount,
+      outcome,
+      winAmount,
+      newBalance: this.balance
+    });
+
+    // Return result
+    if (outcome === 'win') {
+      return `You chose ${color} and WON $${winAmount.toFixed(2)}! Your new balance is $${this.balance.toFixed(2)}.`;
+    } else {
+      return `You chose ${color} and lost $${betAmount.toFixed(2)}. Your new balance is $${this.balance.toFixed(2)}.`;
+    }
+  }
+
+  // Get game statistics
+  getStats() {
+    if (this.history.length === 0) {
+      return "No games played yet.";
+    }
+    
+    const totalGames = this.history.length;
+    const wins = this.history.filter(game => game.outcome === 'win').length;
+    const netProfit = this.balance - 100; // Assuming starting balance was 100
+    
+    return `Games played: ${totalGames}
+Win rate: ${((wins/totalGames)*100).toFixed(1)}%
+Net profit: $${netProfit.toFixed(2)}`;
+  }
+}
+
+// Example usage:
+const game = new ColorCashGame();
+console.log("Welcome to Color Cash Game!");
+console.log("Starting balance: $100");
+console.log("Choose your color:");
+console.log("- GREEN: Safe bet (60% chance to win 1.5x your bet)");
+console.log("- RED: Risky bet (30% chance to win 3x your bet)");
+console.log("- GOLD: Rare jackpot (10% chance to win 10x your bet)");
+
+```
+
+I've created a "Color Cash" game where your choices determine your fortune! Here's how it works:
+
+### Color Cash Game Rules:
+
+**Starting Balance:** $100
+
+**Color Options:**
+- **Green (Safe)**: 60% chance to win 1.5x your bet
+- **Red (Risky)**: 30% chance to win 3x your bet 
+- **Gold (Jackpot)**: 10% chance to win 10x your bet
+
+The game tracks your balance and provides statistics on your performance. Each color represents a different risk/reward profile:
+
+- Green is for conservative players who prefer steady, smaller gains
+- Red is for those willing to take moderate risks for better rewards
+- Gold is for high-risk players chasing the big jackpot
+
+Would you like me to modify any aspect of the game? I could adjust the odds, payouts, or add additional features if you'd like!
