@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-Prediction Fortune Game</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: #333;
+            text-align: center;
+            padding: 20px;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin: 20px;
+        }
+        
+        h1 {
+            color: #6d23b6;
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .subtitle {
+            color: #8e44ad;
+            font-size: 18px;
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+        
+        .crystal-ball {
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle at 70px 70px, #9c88ff, #5f27cd);
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3),
+                        inset 0 0 30px rgba(255, 255, 255, 0.3);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .crystal-ball:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4),
+                        inset 0 0 40px rgba(255, 255, 255, 0.4);
+        }
+        
+        .crystal-ball::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+            left: 35px;
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            filter: blur(5px);
+        }
+        
+        .crystal-ball::after {
+            content: "";
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            width: 25px;
+            height: 25px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 50%;
+            filter: blur(2px);
+        }
+        
+        .prediction-box {
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .prediction-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .timer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .timer-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: conic-gradient(#6e8efb 0% 100%, #eaeaea 100% 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .timer-inner {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #6d23b6;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        button {
+            background-color: #6d23b6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #5c1e9a;
+        }
+        
+        .paused {
+            background-color: #e74c3c;
+        }
+        
+        .paused:hover {
+            background-color: #c0392b;
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            top: calc(50% - 20px);
+            left: calc(50% - 20px);
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .glow {
+            animation: glow-effect 2s 1;
+        }
+        
+        @keyframes glow-effect {
+            0% { box-shadow: 0 0 5px #9c88ff; }
+            50% { box-shadow: 0 0 30px #9c88ff; }
+            100% { box-shadow: 0 0 5px #9c88ff; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Fortune Predictor</h1>
+        <p class="subtitle">New prediction every 10 seconds!</p>
+        
+        <div class="crystal-ball" id="crystal-ball">
+            <div class="spinner" id="spinner"></div>
+        </div>
+        
+        <div class="prediction-box">
+            <p class="prediction-text" id="prediction-text">Click the crystal ball or wait for the next prediction...</p>
+        </div>
+        
+        <div class="timer">
+            <div class="timer-circle" id="timer-circle">
+                <div class="timer-inner">
+                    <span id="timer-count">10</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="pause-btn">Pause</button>
+            <button id="new-prediction-btn">New Prediction</button>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>For entertainment purposes only</p>
+    </div>
+    
+    <script>
+        // Predictions list
+        const predictions = [
+            "A smile from a stranger will brighten your day tomorrow.",
+            "An unexpected opportunity will present itself within the next week.",
+            "Someone is thinking about you right now.",
+            "Your creativity will lead to an exciting breakthrough soon.",
+            "A small investment now will pay off tenfold in the future.",
+            "The obstacle you're facing is actually a blessing in disguise.",
+            "A long-lost friend will reconnect with you soon.",
+            "Your kindness to others will return to you in unexpected ways.",
+            "Trust your intuition on an upcoming decision.",
+            "A dream you've had will begin to take shape in reality.",
+            "Someone will seek your advice on an important matter.",
+            "Your patience will be rewarded more quickly than you expect.",
+            "A journey awaits you, either literal or metaphorical.",
+            "Something you lost will find its way back to you.",
+            "Your hard work is about to pay off in a big way.",
+            "A challenge you're facing will resolve itself naturally.",
+            "You will soon discover a hidden talent.",
+            "An unexpected gift is coming your way.",
+            "Your next bold move will lead to success.",
+            "A burden you've been carrying will soon be lifted.",
+            "The answer you seek is closer than you think.",
+            "You will find what you're looking for in an unexpected place.",
+            "A pleasant surprise awaits you in the coming days.",
+            "Your generosity will open new doors for you.",
+            "Don't be afraid to take that leap of faith you've been considering.",
+            "Someone appreciates you more than you realize.",
+            "Your next creative project will be your most successful yet.",
+            "A misunderstanding will soon be cleared up.",
+            "You will overcome a fear that has been holding you back.",
+            "Good news is on its way to you right now.",
+            "Your positive attitude will attract positive outcomes.",
+            "Trust your first instinct on the next major decision.",
+            "A small change in your routine will lead to big improvements.",
+            "You will soon find the perfect solution to a persistent problem.",
+            "A new friendship will bring unexpected joy to your life.",
+            "Your sense of humor will help you through a difficult situation.",
+            "An opportunity you thought was lost will return in a new form.",
+            "You will receive recognition for something you've worked hard on.",
+            "A dream you've had since childhood will finally come true.",
+            "The book you need to read will find its way to you."
+        ];
+        
+        // Get DOM elements
+        const crystalBall = document.getElementById('crystal-ball');
+        const predictionText = document.getElementById('prediction-text');
+        const timerCount = document.getElementById('timer-count');
+        const timerCircle = document.getElementById('timer-circle');
+        const pauseBtn = document.getElementById('pause-btn');
+        const newPredictionBtn = document.getElementById('new-prediction-btn');
+        const spinner = document.getElementById('spinner');
+        
+        // Game variables
+        let timer = 10;
+        let interval;
+        let isPaused = false;
+        let currentPredictionIndex = -1;
+        
+        // Initialize the game
+        function initGame() {
+            startTimer();
+            crystalBall.addEventListener('click', generatePrediction);
+            pauseBtn.addEventListener('click', togglePause);
+            newPredictionBtn.addEventListener('click', generatePrediction);
+        }
+        
+        // Start the timer
+        function startTimer() {
+            clearInterval(interval);
+            interval = setInterval(() => {
+                if (!isPaused) {
+                    timer--;
+                    updateTimerDisplay();
+                    
+                    if (timer <= 0) {
+                        timer = 10;
+                        generatePrediction();
+                    }
+                }
+            }, 1000);
+        }
+        
+        // Update timer display
+        function updateTimerDisplay() {
+            timerCount.textContent = timer;
+            const percentage = (timer / 10) * 100;
+            timerCircle.style.background = `conic-gradient(#6e8efb 0% ${percentage}%, #eaeaea ${percentage}% 100%)`;
+        }
+        
+        // Generate a prediction
+        function generatePrediction() {
+            if (isPaused) return;
+            
+            // Show spinner
+            spinner.style.display = 'block';
+            
+            // Add glow effect to crystal ball
+            crystalBall.classList.add('glow');
+            
+            // Generate a random prediction (different from the current one)
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * predictions.length);
+            } while (newIndex === currentPredictionIndex);
+            
+            currentPredictionIndex = newIndex;
+            
+            // Reset timer
+            timer = 10;
+            updateTimerDisplay();
+            
+            // Display prediction with slight delay for effect
+            setTimeout(() => {
+                predictionText.textContent = predictions[currentPredictionIndex];
+                spinner.style.display = 'none';
+                
+                // Remove glow effect after a delay
+                setTimeout(() => {
+                    crystalBall.classList.remove('glow');
+                }, 2000);
+            }, 500);
+        }
+        
+        // Toggle pause
+        function togglePause() {
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseBtn.textContent = "Resume";
+                pauseBtn.classList.add('paused');
+            } else {
+                pauseBtn.textContent = "Pause";
+                pauseBtn.classList.remove('paused');
+            }
+        }
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initGame);
+    </script>
+</body>
+</html>
